@@ -1,0 +1,38 @@
+---
+- name: Setup ChromeOS for real development
+  host: localhost
+  connection: local
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Ensure the system packages are up-to-date
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Ensure the Python packages are up-to-date
+      pip:
+        executable: ~/.env/bin/pip
+        name:
+          - pip
+          - ansible
+        state: latest
+
+    - name: Install gpg
+      apt:
+        name: gpg
+        state: latest
+    - name: Add Microsoft apt signing key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+    - name: Add Microsoft apt repository for VSCode
+      apt_repository:
+          repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+          update_cache: yes
+          state: present
+          filename: microsoft-vscode.list
+    - name: Install Microsoft VSCode
+      apt:
+        name: code
+        state: latest
